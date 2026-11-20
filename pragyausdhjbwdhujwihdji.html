@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AgriConnect Marketplace (prototype)</title>
+<style>
+:root{--bg:#f6f3ea;--ink:#1b2a1f;--mut:#5b6b5f;--card:#fff;--line:#e3dfd0;--green:#1f6b3a;--green2:#2f8f4e;--gold:#e0a21b;--red:#b3261e;--goldbg:#fff4d6;--shadow:0 2px 6px rgba(31,60,40,.08),0 8px 24px rgba(31,60,40,.07)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+h1,h2,h3{font-family:Georgia,"Times New Roman",serif;line-height:1.2;margin:0 0 .5rem}
+h1{font-size:clamp(1.7rem,4vw,2.4rem)}
+header{background:linear-gradient(120deg,#16502b,var(--green2));color:#fff;padding:.7rem 1.2rem;display:flex;flex-wrap:wrap;gap:.6rem;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:5;box-shadow:0 2px 10px rgba(0,0,0,.2)}
+header strong{font:700 1.4rem Georgia,serif;letter-spacing:.3px}
+header nav{display:flex;gap:.4rem;flex-wrap:wrap}
+header .tools{display:flex;gap:.4rem;align-items:center}
+header select{width:auto;padding:.3rem .6rem;border-radius:99px}
+header button{background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.4);padding:.35rem .8rem;border-radius:99px;font-size:.92rem}
+header button:hover{background:#fff;color:var(--green)}
+.banner{background:var(--goldbg);border-bottom:1px solid var(--gold);padding:.45rem 1rem;font-size:.88rem;text-align:center}
+main{max-width:1000px;margin:0 auto;padding:1.2rem 1rem 3rem}
+button,select,input,textarea{font:inherit}
+button{cursor:pointer;border:2px solid var(--green);background:var(--green);color:#fff;border-radius:10px;padding:.55rem 1rem;font-weight:600;transition:transform .12s,box-shadow .12s,background .12s}
+button:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(31,107,58,.25)}
+button.alt{background:#fff;color:var(--green)}
+button.alt:hover{background:#eef7f0}
+button.danger{background:#fff;color:var(--red);border-color:var(--red)}
+:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.hero-banner{background:linear-gradient(135deg,#1f6b3a 0%,#2f8f4e 55%,#e0a21b 140%);color:#fff;border-radius:20px;padding:2rem 1.5rem;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.hero-banner p{max-width:52ch;font-size:1.1rem;opacity:.95}
+.hero-banner .field{font-size:2rem;letter-spacing:.5rem;margin-top:1rem;opacity:.95}
+.hero{display:grid;gap:1rem;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));margin-top:1.2rem}
+.big{padding:1.4rem;text-align:left;border-radius:16px;font-size:1.25rem;box-shadow:var(--shadow);font-family:Georgia,serif}
+.big span{display:block;font:400 .95rem system-ui,sans-serif;margin-top:.3rem;opacity:.9}
+.big:hover{transform:translateY(-3px)}
+.grid{display:grid;gap:1.1rem;grid-template-columns:repeat(auto-fill,minmax(270px,1fr))}
+.card{background:var(--card);border:1px solid var(--line);border-top:5px solid var(--green2);border-radius:16px;padding:1.1rem;box-shadow:var(--shadow);transition:transform .15s,box-shadow .15s}
+.grid .card:hover{transform:translateY(-4px);box-shadow:0 10px 28px rgba(31,60,40,.15)}
+.card.dim{border-top-color:#c9c5b5;opacity:.8}
+.price{display:inline-block;font-size:1.15rem;font-weight:700;color:var(--green);background:#e9f5ec;border-radius:8px;padding:.1rem .6rem;margin:.2rem 0}
+.tag{display:inline-block;font-size:.78rem;border:1px solid var(--mut);border-radius:99px;padding:0 .55rem;margin-right:.25rem;background:#fff}
+.tag.ok{border-color:var(--green);color:var(--green);background:#e9f5ec}.tag.off{border-color:var(--red);color:var(--red);background:#fdecea}
+.bar{display:flex;flex-wrap:wrap;gap:.6rem;margin:1rem 0;align-items:end;background:#fff;padding:.9rem;border-radius:16px;box-shadow:var(--shadow)}
+label{display:block;font-weight:600;margin-top:.75rem}
+.bar label{font-size:.85rem;color:var(--mut)}
+input,select,textarea{width:100%;padding:.55rem .7rem;border:2px solid var(--line);border-radius:10px;background:#fff}
+input:focus,select:focus,textarea:focus{border-color:var(--green2)}
+input[aria-invalid=true],select[aria-invalid=true]{border-color:var(--red)}
+.err{color:var(--red);font-size:.9rem;min-height:1.1em}
+.row2{display:grid;gap:.75rem;grid-template-columns:1fr 1fr}
+.tabs{display:flex;gap:.5rem;flex-wrap:wrap;margin:1rem 0}
+.tabs button{border-radius:99px}
+.tabs button[aria-current=true]{background:var(--gold);border-color:var(--gold);color:#1b2a1f}
+.actions{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.75rem}
+.empty{text-align:center;padding:2.5rem;border:2px dashed var(--line);border-radius:16px;background:#fff}
+#toast{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);background:#16502b;color:#fff;padding:.7rem 1.2rem;border-radius:12px;max-width:90vw;display:none;box-shadow:0 8px 24px rgba(0,0,0,.3);z-index:10}
+.emoji{font-size:2.2rem;line-height:1}
+.top{display:flex;justify-content:space-between;align-items:start;gap:.5rem}
+.save{background:#fff;color:var(--ink);border-color:var(--line);padding:.2rem .7rem;border-radius:99px;font-weight:500}
+.save[aria-pressed=true]{border-color:var(--gold);color:#8a5d00;background:var(--goldbg)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:1rem;margin:1.4rem 0}
+.stat{background:#fff;border-radius:16px;padding:.9rem 1.2rem;box-shadow:var(--shadow);border-left:5px solid var(--gold)}
+.stat b{display:block;font:700 2rem Georgia,serif;color:var(--green)}
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem;margin-top:1rem}
+.step{background:#fff;border-radius:16px;padding:1rem 1.2rem;box-shadow:var(--shadow)}
+.step .n{display:inline-grid;place-items:center;width:2rem;height:2rem;border-radius:50%;background:var(--green);color:#fff;font-weight:700;margin-bottom:.4rem}
+.note{font-size:.85rem;color:var(--mut)}
+.track{display:flex;gap:.3rem;flex-wrap:wrap;margin:.6rem 0}
+.tstep{flex:1;min-width:110px;text-align:center;font-size:.85rem;padding:.35rem .2rem;border-radius:8px;background:#eee;color:var(--mut)}
+.tstep.done{background:#e9f5ec;color:var(--green);font-weight:600}
+.tstep.now{background:var(--gold);color:#1b2a1f;font-weight:700}
+.sum{background:#f3f8f4;border:1px solid var(--line);border-radius:10px;padding:.7rem 1rem;margin-top:.8rem}
+.sum div{display:flex;justify-content:space-between}
+.sum .tot{font-weight:700;font-size:1.1rem;border-top:1px solid var(--line);margin-top:.3rem;padding-top:.3rem}
+.radio{display:flex;gap:.6rem;flex-wrap:wrap}
+.radio label{display:flex;align-items:center;gap:.4rem;font-weight:500;border:2px solid var(--line);border-radius:10px;padding:.5rem .8rem;margin:0;cursor:pointer;background:#fff}
+.radio input{width:auto}
+.radio label:has(input:checked){border-color:var(--green);background:#e9f5ec}
+.pulse{animation:pl 1s infinite}@keyframes pl{50%{opacity:.4}}
+footer{text-align:center;color:var(--mut);font-size:.85rem;padding:1rem}
+@media(max-width:520px){.row2{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <strong>🌱 AgriConnect</strong>
+  <nav aria-label="Switch demo role">
+    <button onclick="go('home')">Home</button>
+    <button onclick="go('buyer')">Find produce</button>
+    <button onclick="go('farmer')">Sell crops</button>
+    <button onclick="go('orders')">My orders</button>
+    <button onclick="resetDemo()">Reset demo data</button>
+  </nav>
+  <div class="tools"><select id="lang" data-nt aria-label="Language" onchange="changeLang(this.value)"><option value="en">English</option><option value="hi">हिन्दी</option></select> <button class="micbtn" onclick="voiceSearch()">🎤 Speak</button> <button onclick="listen()">🔊 Listen</button></div>
+</header>
+<div class="banner" role="note"><b>Prototype:</b> all farmers, listings, contacts and inquiries are fictional sample data. Payment and delivery are <b>simulated</b>: no real money moves and no card or bank details are collected.</div>
+<main id="app"></main>
+<footer>AgriConnect prototype · sample data only · built for the Vibe-Coding Competition</footer>
+<div id="toast" role="status" aria-live="polite"></div>
+<script>
+const KEY = 'agriconnect-v1';
+const UNITS = ['kg', 'quintal', 'tonne', 'crate'];
+const SELLERS = [
+  {id:'s1', name:'Ramesh Kumar (sample)', location:'Vaishali', contact:'Fictional phone: 00000 11111'},
+  {id:'s2', name:'Sunita Devi (sample)', location:'Nalanda', contact:'Fictional phone: 00000 22222'}
+];
+function seed(){
+  const d = (n)=>new Date(Date.now()+n*864e5).toISOString().slice(0,10);
+  return {
+    nextL:7, nextI:2,
+    listings:[
+      {id:1,seller:'s1',crop:'Wheat',qty:50,unit:'quintal',price:2400,basis:'per quintal',location:'Vaishali',date:d(5),grade:'Grade A',desc:'Clean, dry grain from this season.',status:'active',created:d(-2)},
+      {id:2,seller:'s1',crop:'Tomato',qty:800,unit:'kg',price:22,basis:'per kg',location:'Vaishali',date:d(1),grade:'',desc:'Fresh, picked in the morning.',status:'active',created:d(-1)},
+      {id:3,seller:'s2',crop:'Potato',qty:20,unit:'tonne',price:14000,basis:'per tonne',location:'Nalanda',date:d(10),grade:'Medium size',desc:'Good for storage.',status:'active',created:d(-3)},
+      {id:4,seller:'s2',crop:'Maize',qty:30,unit:'quintal',price:2100,basis:'per quintal',location:'Nalanda',date:d(14),grade:'',desc:'Ready after harvest.',status:'active',created:d(-4)},
+      {id:5,seller:'s2',crop:'Tomato',qty:300,unit:'kg',price:25,basis:'per kg',location:'Nalanda',date:d(2),grade:'',desc:'Small farm lot.',status:'active',created:d(0)},
+      {id:6,seller:'s1',crop:'Potato',qty:5,unit:'tonne',price:13500,basis:'per tonne',location:'Vaishali',date:d(-3),grade:'',desc:'Already sold.',status:'inactive',created:d(-9)}
+    ],
+    inquiries:[
+      {id:1,listing:1,buyer:'Sample Sweets Shop',qty:10,pref:'Phone call',msg:'Is the price negotiable for 10 quintal?',status:'new',created:new Date().toISOString()}
+    ]
+  };
+}
+function load(){ try{ const s=JSON.parse(localStorage.getItem(KEY)); if(s&&s.listings) return s; }catch(e){} return seed(); }
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(db)); }catch(e){} }
+let db = load(); if(!db.saved) db.saved=[]; if(!db.orders) db.orders=[]; if(!db.nextO) db.nextO=1;
+let ui = {view:'home', farmer:'s1', tab:'listings', filterCrop:'', filterLoc:'', sort:'new', savedOnly:false, openId:null, editId:null};
+
+/* ---------- Languages (English / Hindi) ---------- */
+let LANG='en'; try{ LANG=localStorage.getItem('agriconnect-lang')||'en'; }catch(e){}
+const LOC=()=>LANG==='hi'?'hi-IN':'en-IN';
+const HI_EX={
+'Home':'होम','Find produce':'उपज खोजें','Sell crops':'फसल बेचें','My orders':'मेरे ऑर्डर','Reset demo data':'डेमो डेटा रीसेट करें','Listen':'सुनें','Switch demo role':'डेमो भूमिका बदलें',
+'Prototype:':'प्रोटोटाइप:','all farmers, listings, contacts and inquiries are fictional sample data. Payment and delivery are':'सभी किसान, लिस्टिंग, संपर्क और पूछताछ काल्पनिक नमूना डेटा हैं। भुगतान और डिलीवरी','simulated':'नकली (सिमुलेटेड)',': no real money moves and no card or bank details are collected.':': कोई असली पैसा नहीं चलता और कार्ड या बैंक की जानकारी नहीं ली जाती।',
+'AgriConnect prototype · sample data only · built for the Vibe-Coding Competition':'एग्रीकनेक्ट प्रोटोटाइप · सिर्फ़ नमूना डेटा · वाइब-कोडिंग प्रतियोगिता के लिए बनाया गया',
+'Fresh from the farm, straight to your kitchen.':'खेत से सीधे आपकी रसोई तक।','Farmers list what they can sell. Buyers find it, compare it and send an inquiry directly. No middleman needed to get started.':'किसान बताते हैं कि वे क्या बेच सकते हैं। खरीदार उसे खोजते हैं, तुलना करते हैं और सीधे पूछताछ भेजते हैं। शुरू करने के लिए बिचौलिए की ज़रूरत नहीं।',
+'I am a farmer':'मैं किसान हूँ','Publish a listing and read buyer inquiries.':'अपनी फसल की लिस्टिंग डालें और खरीदारों की पूछताछ देखें।','I am a buyer':'मैं खरीदार हूँ','Search listings and ask a farmer about one.':'लिस्टिंग खोजें और किसान से पूछताछ करें।',
+'active listings':'चालू लिस्टिंग','new inquiries':'नई पूछताछ','orders placed':'दिए गए ऑर्डर','How the demo works':'डेमो कैसे काम करता है','Publish':'प्रकाशित करें','A farmer adds crop, quantity, price and location.':'किसान फसल, मात्रा, दाम और जगह जोड़ता है।','Discover':'खोजें','A buyer searches, filters, sorts and opens the details.':'खरीदार खोजता है, फ़िल्टर और सॉर्ट करता है, और विवरण खोलता है।','Connect':'जुड़ें','The buyer sends an inquiry and the farmer updates its status.':'खरीदार पूछताछ भेजता है और किसान उसकी स्थिति अपडेट करता है।',
+'Crop':'फसल','e.g. Tomato':'जैसे: टमाटर','Location':'जगह','All locations':'सभी जगहें','Sort by':'ऐसे क्रमबद्ध करें','Recently added':'हाल में जोड़ी गई','Price: low to high':'दाम: कम से ज़्यादा','Price: high to low':'दाम: ज़्यादा से कम','Saved only':'सिर्फ़ सहेजी हुई','Saved':'सहेजी गई','Save':'सहेजें',
+'Price sorting compares per-kg equivalents. Crate prices are listed last.':'दाम का क्रम प्रति किलो के बराबर मान से तय होता है। क्रेट के दाम सबसे अंत में दिखते हैं।','No listings match your search.':'आपकी खोज से कोई लिस्टिंग नहीं मिली।','You have no saved listings that match.':'आपकी कोई सहेजी हुई लिस्टिंग यहाँ नहीं मिली।','Clear search and filters':'खोज और फ़िल्टर हटाएं','Sample listing':'नमूना लिस्टिंग','View details':'विवरण देखें','Saved for later.':'बाद के लिए सहेजा गया।','Removed from saved.':'सहेजी सूची से हटाया गया।',
+'Back to results':'नतीजों पर वापस','Active':'चालू','Inactive / sold':'बंद / बिक गई','Quantity:':'मात्रा:','Seller:':'विक्रेता:','(not verified)':'(सत्यापित नहीं)','Not stated':'नहीं बताया','No description.':'कोई विवरण नहीं।',
+'Send an inquiry':'पूछताछ भेजें','Send inquiry':'पूछताछ भेजें','An inquiry is not an order. The farmer will contact you.':'पूछताछ ऑर्डर नहीं है। किसान आपसे संपर्क करेगा।','Your name or business':'आपका नाम या व्यवसाय','How should the farmer reach you?':'किसान आपसे कैसे संपर्क करे?','Phone call':'फ़ोन कॉल','Text message':'टेक्स्ट संदेश','Message (optional)':'संदेश (वैकल्पिक)',
+'Or place an order (simulated)':'या ऑर्डर दें (नकली)','Choose delivery and payment. This is a demo, so no real money moves.':'डिलीवरी और भुगतान चुनें। यह डेमो है, इसलिए कोई असली पैसा नहीं चलता।','Delivery option':'डिलीवरी का तरीका','Farm pickup (free)':'खेत से उठाएं (मुफ़्त)','Delivery town or area (no exact address needed)':'डिलीवरी का गाँव/कस्बा या इलाका (पूरा पता ज़रूरी नहीं)','Payment method':'भुगतान का तरीका','Cash on handover':'सामान मिलने पर नकद','UPI (simulated)':'यूपीआई (नकली)','Bank transfer (simulated)':'बैंक ट्रांसफ़र (नकली)','Enter a quantity to see the total.':'कुल रकम देखने के लिए मात्रा डालें।','Place order (simulated)':'ऑर्डर दें (नकली)','Farmer confirms price':'किसान दाम तय करेगा','Delivery':'डिलीवरी','Free':'मुफ़्त','Total':'कुल','Total:':'कुल:','to be confirmed by farmer':'किसान द्वारा तय होगा',
+'Enter your name or business.':'अपना नाम या व्यवसाय लिखें।','Enter a quantity greater than 0.':'0 से ज़्यादा मात्रा लिखें।','Please fix the highlighted fields.':'कृपया लाल निशान वाली जगहें ठीक करें।','Please fix the highlighted fields. Your entries are kept.':'कृपया लाल निशान वाली जगहें ठीक करें। आपकी भरी जानकारी सुरक्षित है।','Enter your town or area.':'अपना गाँव/कस्बा या इलाका लिखें।','Inquiry sent. The farmer can now see it in their inbox.':'पूछताछ भेज दी गई। किसान इसे अपने इनबॉक्स में देख सकता है।','Order placed. The farmer will confirm it.':'ऑर्डर दे दिया गया। किसान इसकी पुष्टि करेगा।',
+'Placed':'दिया गया','Confirmed':'पुष्टि हुई','Out for delivery':'डिलीवरी के लिए निकला','Ready for pickup':'उठाने के लिए तैयार','Completed':'पूरा हुआ','Paid (simulated)':'चुकाया गया (नकली)','Payment pending':'भुगतान बाकी','Pay now (simulated)':'अभी भुगतान करें (नकली)','Processing…':'प्रक्रिया जारी…','Payment successful (simulated). No real money moved.':'भुगतान सफल (नकली)। कोई असली पैसा नहीं चला।','No orders yet.':'अभी कोई ऑर्डर नहीं।','Orders from buyers appear here.':'खरीदारों के ऑर्डर यहाँ दिखेंगे।','Order complete':'ऑर्डर पूरा',
+'Demo farmer':'डेमो किसान','My listings':'मेरी लिस्टिंग','Add listing':'लिस्टिंग जोड़ें','Edit listing':'लिस्टिंग बदलें','You have no listings yet.':'आपकी अभी कोई लिस्टिंग नहीं है।','Add your first listing':'अपनी पहली लिस्टिंग जोड़ें','Edit':'बदलें','Mark sold / inactive':'बिक गई / बंद करें','Make active again':'फिर से चालू करें','Listing is active and visible to buyers.':'लिस्टिंग चालू है और खरीदारों को दिख रही है।','Listing hidden from buyers.':'लिस्टिंग खरीदारों से छिपा दी गई।',
+'Add a listing':'नई लिस्टिंग जोड़ें','Fields marked * are required.':'* वाली जगहें भरना ज़रूरी है।','Crop name *':'फसल का नाम *','Quantity *':'मात्रा *','Unit *':'इकाई *','Price in ₹ *':'दाम (₹ में) *','Price basis *':'दाम किस इकाई का *','Location (village or district) *':'जगह (गाँव या ज़िला) *','Available from *':'कब से उपलब्ध *','Quality / grade (optional)':'गुणवत्ता / ग्रेड (वैकल्पिक)','Description (optional)':'विवरण (वैकल्पिक)','Publish listing':'लिस्टिंग प्रकाशित करें','Save changes':'बदलाव सहेजें','Cancel':'रद्द करें','Enter the crop name.':'फसल का नाम लिखें।','Enter a price greater than 0.':'0 से ज़्यादा दाम लिखें।','Enter a location.':'जगह लिखें।','Choose the date it is available.':'उपलब्धता की तारीख चुनें।','Changes saved.':'बदलाव सहेज लिए गए।','Listing published. Buyers can now find it.':'लिस्टिंग प्रकाशित हो गई। खरीदार अब इसे खोज सकते हैं।',
+'No inquiries yet.':'अभी कोई पूछताछ नहीं।','When a buyer asks about your crop, it will appear here.':'जब कोई खरीदार आपकी फसल के बारे में पूछेगा, वह यहाँ दिखेगी।','From':'खरीदार:','Status':'स्थिति','new':'नई','contacted':'संपर्क हुआ','closed':'बंद',
+'Reset all data back to the sample state?':'सारा डेटा वापस नमूना स्थिति में ले जाएँ?','Demo reset to sample data.':'डेमो नमूना डेटा पर लौट गया।','Voice is not available on this device.':'इस डिवाइस पर आवाज़ उपलब्ध नहीं है।','Speak':'बोलकर खोजें','Speak to search':'बोलकर खोजें','Read this listing aloud':'यह लिस्टिंग सुनें','Listening… say a crop name, for example tomato':'सुन रहा हूँ… किसी फसल का नाम बोलें, जैसे टमाटर','Voice search is not supported in this browser. Try Chrome.':'इस ब्राउज़र में बोलकर खोज नहीं चलती। Chrome आज़माएँ।','Microphone is blocked. Allow microphone access and try again.':'माइक्रोफ़ोन बंद है। माइक की अनुमति दें और फिर कोशिश करें।','I did not hear anything. Please try again.':'कुछ सुनाई नहीं दिया। कृपया फिर से बोलें।','Voice search failed. Please try again.':'बोलकर खोज नहीं हो सकी। कृपया फिर कोशिश करें।',
+'Medium size':'मध्यम आकार','Clean, dry grain from this season.':'इस मौसम का साफ़, सूखा अनाज।','Fresh, picked in the morning.':'ताज़ा, सुबह तोड़ा हुआ।','Good for storage.':'भंडारण के लिए अच्छा।','Ready after harvest.':'कटाई के बाद तैयार।','Small farm lot.':'छोटे खेत की उपज।','Already sold.':'पहले ही बिक चुका।','Sample Sweets Shop':'नमूना मिठाई की दुकान','Is the price negotiable for 10 quintal?':'क्या 10 क्विंटल के लिए दाम में छूट मिल सकती है?'};
+const HI_RX=[
+[/^(\d+) active listings? found$/,'$1 चालू लिस्टिंग मिली'],[/^Inquiries \((\d+) new\)$/,'पूछताछ ($1 नई)'],[/^Orders \((\d+) open\)$/,'ऑर्डर ($1 खुले)'],
+[/^(.+) available$/,'$1 उपलब्ध'],[/^(.+) · from (.+)$/,'$1 · $2 से'],[/^Seller: (.+)$/,'विक्रेता: $1'],[/^Listed on: (.+)$/,'जोड़ने की तारीख: $1'],[/^Listed (.+)$/,'जोड़ा गया: $1'],
+[/^Location: (.+)$/,'जगह: $1'],[/^Available from: (.+)$/,'उपलब्ध होने की तारीख: $1'],[/^Available from (.+)$/,'उपलब्ध: $1 से'],[/^Quality: (.+)$/,'गुणवत्ता: $1'],[/^Fictional phone: (.+)$/,'काल्पनिक फ़ोन: $1'],
+[/^Quantity you need \((.+)\)$/,'आपको कितनी मात्रा चाहिए ($1)'],[/^Quantity \((.+)\), up to (.+)$/,'मात्रा ($1), अधिकतम $2'],[/^Home delivery \((.+)\)$/,'घर तक डिलीवरी ($1)'],[/^Goods \((.+)\)$/,'सामान ($1)'],
+[/^Enter a quantity between 0 and (.+)\.$/,'मात्रा 0 से ज़्यादा और $1 तक होनी चाहिए।'],
+[/^(.+) · Order #(\d+) from (.+)$/,'$1 · ऑर्डर #$2 · खरीदार: $3'],[/^(.+) · Order #(\d+)$/,'$1 · ऑर्डर #$2'],
+[/^(.+?) · \p{Extended_Pictographic} Delivery to (.+)$/u,'$1 · 🚚 $2 तक डिलीवरी'],[/^(.+?) · \p{Extended_Pictographic} Farm pickup$/u,'$1 · 🚜 खेत से उठाना'],
+[/^Payment: (.+?) ·$/,'भुगतान: $1 ·'],[/^· prefers (.+)$/,'· पसंद: $1'],[/^(.+) · (.+) requested$/,'$1 · $2 चाहिए'],
+[/^Mark as: (.+)$/,'इसे चिह्नित करें: $1'],[/^Order updated: (.+)\.$/,'ऑर्डर अपडेट: $1।'],[/^Inquiry marked as (.+)\.$/,'पूछताछ की स्थिति: $1।']];
+const HI_TK=[[/\bkg\b/g,'किग्रा'],[/\bquintal\b/g,'क्विंटल'],[/\btonne\b/g,'टन'],[/\bcrate\b/g,'क्रेट'],[/\bper\b/g,'प्रति'],[/\bWheat\b/g,'गेहूं'],[/\bTomato\b/g,'टमाटर'],[/\bPotato\b/g,'आलू'],[/\bMaize\b/g,'मक्का'],[/\bRice\b/g,'चावल'],[/\bOnion\b/g,'प्याज'],[/\bGrade\b/g,'ग्रेड'],[/\(sample\)/g,'(नमूना)'],[/\bVaishali\b/g,'वैशाली'],[/\bNalanda\b/g,'नालंदा'],[/Ramesh Kumar/g,'रमेश कुमार'],[/Sunita Devi/g,'सुनीता देवी']];
+function trCore(c){
+  if(HI_EX[c]) return HI_EX[c];
+  for(const [re,t] of HI_RX){ const m=c.match(re); if(m) return t.replace(/\$(\d)/g,(_,i)=>trCore(m[i])); }
+  for(const [re,h] of HI_TK) c=c.replace(re,h);
+  return c;
+}
+function tr(s){
+  if(LANG!=='hi') return s;
+  const m=String(s).match(/^([\s\p{Extended_Pictographic}\uFE0F\u200D✔●○♥♡✖“]*)([\s\S]*?)([\s”]*)$/u);
+  return m[2] ? m[1]+trCore(m[2])+m[3] : s;
+}
+function applyLang(root){
+  root=root||document.body;
+  const w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,{acceptNode:n=>n.parentElement&&!n.parentElement.closest('script,style,textarea,[data-nt]')?1:2}), a=[];
+  while(w.nextNode()) a.push(w.currentNode);
+  a.forEach(n=>{ if(n.__en===undefined) n.__en=n.nodeValue; const v=tr(n.__en); if(n.nodeValue!==v) n.nodeValue=v; });
+  root.querySelectorAll('[placeholder],[aria-label]').forEach(e=>{ if(e.closest('[data-nt]')) return; ['placeholder','aria-label'].forEach(k=>{ if(e.hasAttribute(k)){ if(e['__'+k]===undefined) e['__'+k]=e.getAttribute(k); e.setAttribute(k,tr(e['__'+k])); } }); });
+}
+function changeLang(v){ if(window.speechSynthesis) speechSynthesis.cancel(); LANG=v; try{ localStorage.setItem('agriconnect-lang',v); }catch(e){} document.documentElement.lang=v; render(); }
+function listen(){
+  if(!('speechSynthesis' in window)){ toast('Voice is not available on this device.'); return; }
+  if(speechSynthesis.speaking){ speechSynthesis.cancel(); return; }
+  const u=new SpeechSynthesisUtterance($('app').innerText.replace(/\s+/g,' ').slice(0,1800)); u.lang=LOC(); speechSynthesis.speak(u);
+}
+
+/* ---------- Voice: speak to search, listen to results ---------- */
+const VOICE={rec:null};
+const V_CROPS=[['Wheat','गेहूं',['wheat','गेहूं','गेहूँ','गेहु']],['Tomato','टमाटर',['tomato','टमाटर']],['Potato','आलू',['potato','आलू']],['Maize','मक्का',['maize','corn','मक्का','मकई']],['Rice','चावल',['rice','चावल']],['Onion','प्याज',['onion','प्याज','प्याज़']]];
+const V_LOCS=[['Vaishali',['vaishali','वैशाली']],['Nalanda',['nalanda','नालंदा']]];
+function speak(t){
+  if(!('speechSynthesis' in window)){ toast('Voice is not available on this device.'); return; }
+  speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(t); u.lang=LOC(); speechSynthesis.speak(u);
+}
+function describe(l){
+  const hi=LANG==='hi', c=tr(l.crop), loc=tr(l.location), nm=tr(seller(l.seller).name).replace(/\s*\(.*\)/,''), b=tr(l.basis), u=tr(l.unit);
+  return hi ? `${c}। ${l.price} रुपये ${b}। ${l.qty} ${u} उपलब्ध। जगह ${loc}। विक्रेता ${nm}।`
+            : `${c}. ${l.price} rupees ${b}. ${l.qty} ${u} available. Location ${loc}. Seller ${nm}.`;
+}
+function speakListing(id){ speak(describe(listing(id))); }
+function speakResults(heard){
+  const r=results(), hi=LANG==='hi';
+  let t=(hi?'आपने कहा: ':'You said: ')+heard+'. ';
+  if(!r.length) t+=hi?'कोई लिस्टिंग नहीं मिली। कृपया दूसरी फसल बोलकर देखें।':'No listings found. Please try another crop.';
+  else t+=(hi?r.length+' चालू लिस्टिंग मिली। ':r.length+' active listing'+(r.length>1?'s':'')+' found. ')+r.slice(0,3).map(describe).join(' ');
+  speak(t);
+}
+function handleVoice(text){
+  const q=text.toLowerCase(), hi=LANG==='hi';
+  const c=V_CROPS.find(x=>x[2].some(w=>q.includes(w))), loc=V_LOCS.find(x=>x[1].some(w=>q.includes(w)));
+  ui.view='buyer'; ui.openId=null; ui.savedOnly=false;
+  ui.filterCrop = c ? (hi?c[1]:c[0]) : (loc ? '' : text.replace(/[.।?!]+$/,'').trim());
+  ui.filterLoc = loc ? loc[0] : '';
+  render(); window.scrollTo(0,0); speakResults(text);
+}
+function setMic(on){ document.querySelectorAll('.micbtn').forEach(b=>b.classList.toggle('pulse',on)); }
+function voiceSearch(){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){ toast('Voice search is not supported in this browser. Try Chrome.'); return; }
+  if(VOICE.rec){ VOICE.rec.stop(); return; }
+  if(window.speechSynthesis) speechSynthesis.cancel();
+  const r=new SR(); VOICE.rec=r; r.lang=LOC(); r.interimResults=false; r.maxAlternatives=1;
+  r.onresult=e=>handleVoice(e.results[0][0].transcript);
+  r.onerror=e=>toast(e.error==='not-allowed'||e.error==='service-not-allowed'?'Microphone is blocked. Allow microphone access and try again.':e.error==='no-speech'?'I did not hear anything. Please try again.':'Voice search failed. Please try again.');
+  r.onend=()=>{ VOICE.rec=null; setMic(false); };
+  try{ r.start(); setMic(true); toast('Listening… say a crop name, for example tomato'); }catch(err){ VOICE.rec=null; setMic(false); }
+}
+
+const $ = (id)=>document.getElementById(id);
+const esc = (s)=>String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const money = (n)=>'₹' + Number(n).toLocaleString('en-IN');
+const fdate = (s)=>new Date(s).toLocaleDateString(LOC(),{day:'numeric',month:'short',year:'numeric'});
+const seller = (id)=>SELLERS.find(s=>s.id===id);
+const listing = (id)=>db.listings.find(l=>l.id===id);
+function toast(msg){ const t=$('toast'); t.textContent=tr(msg); t.style.display='block'; clearTimeout(toast.t); toast.t=setTimeout(()=>t.style.display='none',3500); }
+function go(v){ ui.view=v; ui.openId=null; ui.editId=null; if(v==='farmer') ui.tab='listings'; render(); window.scrollTo(0,0); }
+function resetDemo(){ if(confirm(tr('Reset all data back to the sample state?'))){ db=seed(); save(); ui={view:'home',farmer:'s1',tab:'listings',filterCrop:'',filterLoc:'',sort:'new',savedOnly:false,openId:null,editId:null}; render(); toast('Demo reset to sample data.'); } }
+
+function render(){
+  const app = $('app');
+  if(ui.view==='home') app.innerHTML = homeView();
+  else if(ui.view==='buyer') app.innerHTML = ui.openId ? detailView() : buyerView();
+  else if(ui.view==='orders') app.innerHTML = ordersView();
+  else app.innerHTML = farmerView();
+  if(ui.view==='buyer' && !ui.openId) renderList();
+  applyLang(document.body);
+}
+
+function homeView(){
+  const act=activeListings().length, nw=db.inquiries.filter(i=>i.status==='new').length;
+  return `<section class="hero-banner">
+    <h1>Fresh from the farm, straight to your kitchen.</h1>
+    <p>Farmers list what they can sell. Buyers find it, compare it and send an inquiry directly. No middleman needed to get started.</p>
+    <div class="field" aria-hidden="true">🌾 🍅 🥔 🌽 🧅</div>
+  </section>
+  <div class="hero">
+    <button class="big" onclick="go('farmer')">🧑‍🌾 I am a farmer<span>Publish a listing and read buyer inquiries.</span></button>
+    <button class="big alt" onclick="go('buyer')">🛒 I am a buyer<span>Search listings and ask a farmer about one.</span></button>
+  </div>
+  <div class="stats"><div class="stat"><b>${act}</b>active listings</div><div class="stat"><b>${nw}</b>new inquiries</div><div class="stat"><b>${db.orders.length}</b>orders placed</div></div>
+  <h2>How the demo works</h2>
+  <div class="steps">
+    <div class="step"><span class="n">1</span><h3>Publish</h3>A farmer adds crop, quantity, price and location.</div>
+    <div class="step"><span class="n">2</span><h3>Discover</h3>A buyer searches, filters, sorts and opens the details.</div>
+    <div class="step"><span class="n">3</span><h3>Connect</h3>The buyer sends an inquiry and the farmer updates its status.</div>
+  </div>`;
+}
+
+/* ---------- Buyer ---------- */
+const EMOJI={wheat:'🌾',tomato:'🍅',potato:'🥔',maize:'🌽',rice:'🍚',onion:'🧅'};
+const emoji=(c)=>EMOJI[c.trim().toLowerCase()]||'🌱';
+function activeListings(){ return db.listings.filter(l=>l.status==='active'); }
+function perKg(l){ return l.basis==='per kg'?l.price : l.basis==='per quintal'?l.price/100 : l.basis==='per tonne'?l.price/1000 : null; }
+function results(){
+  const q=ui.filterCrop.trim().toLowerCase();
+  let r=activeListings().filter(l=>(!q||l.crop.toLowerCase().includes(q)||tr(l.crop).toLowerCase().includes(q)) && (!ui.filterLoc||l.location===ui.filterLoc) && (!ui.savedOnly||db.saved.includes(l.id)));
+  if(ui.sort==='new') r.sort((a,b)=>b.created.localeCompare(a.created)||b.id-a.id);
+  else { const k=(l)=>perKg(l)===null?Infinity:perKg(l); r.sort((a,b)=>{ const x=k(a),y=k(b); if(x===y) return 0; if(x===Infinity) return 1; if(y===Infinity) return -1; return ui.sort==='low'?x-y:y-x; }); }
+  return r;
+}
+function cardHtml(l){
+  const sv=db.saved.includes(l.id);
+  return `<article class="card"><div class="top"><div><span class="emoji" aria-hidden="true">${emoji(l.crop)}</span><h3>${esc(l.crop)}</h3></div>
+    <button class="save" aria-pressed="${sv}" onclick="toggleSave(${l.id})">${sv?'♥ Saved':'♡ Save'}</button></div>
+    <div class="price">${money(l.price)} ${esc(l.basis)}</div>
+    <p>${esc(l.qty)} ${esc(l.unit)} available<br>${esc(l.location)} · from ${fdate(l.date)}<br>Seller: ${esc(seller(l.seller).name)}<br><span class="note">Listed ${fdate(l.created)}</span></p>
+    <span class="tag">Sample listing</span>
+    <div class="actions"><button onclick="openL(${l.id})">View details</button><button class="alt" onclick="speakListing(${l.id})" aria-label="Read this listing aloud">🔊</button></div></article>`;
+}
+function toggleSave(id){ const i=db.saved.indexOf(id); if(i<0){db.saved.push(id);toast('Saved for later.');} else {db.saved.splice(i,1);toast('Removed from saved.');} save(); if(ui.openId) render(); else renderList(); }
+function buyerView(){
+  const locs=[...new Set(activeListings().map(l=>l.location))].sort();
+  return `<h1>Find produce</h1>
+  <div class="bar">
+    <div style="flex:2;min-width:160px"><label for="fc" style="margin:0">Crop</label><div style="display:flex;gap:.4rem"><input id="fc" style="flex:1" value="${esc(ui.filterCrop)}" placeholder="e.g. Tomato" oninput="ui.filterCrop=this.value;renderList()"><button type="button" class="alt micbtn" onclick="voiceSearch()" aria-label="Speak to search">🎤 Speak</button></div></div>
+    <div style="flex:1;min-width:140px"><label for="fl" style="margin:0">Location</label>
+      <select id="fl" onchange="ui.filterLoc=this.value;renderList()"><option value="">All locations</option>${locs.map(x=>`<option value="${esc(x)}" ${x===ui.filterLoc?'selected':''}>${esc(x)}</option>`).join('')}</select></div>
+    <div style="flex:1;min-width:140px"><label for="so" style="margin:0">Sort by</label>
+      <select id="so" onchange="ui.sort=this.value;renderList()"><option value="new" ${ui.sort==='new'?'selected':''}>Recently added</option><option value="low" ${ui.sort==='low'?'selected':''}>Price: low to high</option><option value="high" ${ui.sort==='high'?'selected':''}>Price: high to low</option></select></div>
+    <button id="sv" class="alt" aria-pressed="${ui.savedOnly}" onclick="ui.savedOnly=!ui.savedOnly;this.setAttribute('aria-pressed',ui.savedOnly);renderList()">♥ Saved only</button>
+  </div>
+  <p class="note">Price sorting compares per-kg equivalents. Crate prices are listed last.</p>
+  <div id="list"></div>`;
+}
+function renderList(){ renderList0(); applyLang($('list')); }
+function renderList0(){
+  const r=results(), el=$('list'); if(!el) return;
+  el.innerHTML = r.length ? `<p>${r.length} active listing${r.length>1?'s':''} found</p><div class="grid">${r.map(cardHtml).join('')}</div>`
+    : `<div class="empty"><p><b>${ui.savedOnly?'You have no saved listings that match.':'No listings match your search.'}</b></p><button onclick="ui.filterCrop='';ui.filterLoc='';ui.savedOnly=false;render()">Clear search and filters</button></div>`;
+}
+function openL(id){ ui.openId=id; render(); window.scrollTo(0,0); }
+function detailView(){
+  const l = listing(ui.openId), s = seller(l.seller);
+  return `<button class="alt" onclick="ui.openId=null;render()">Back to results</button>
+  <div class="card" style="margin-top:1rem">
+    <div class="top"><h1><span aria-hidden="true">${emoji(l.crop)}</span> ${esc(l.crop)}</h1><button class="save" aria-pressed="${db.saved.includes(l.id)}" onclick="toggleSave(${l.id})">${db.saved.includes(l.id)?'♥ Saved':'♡ Save'}</button></div>
+    <div class="price">${money(l.price)} ${esc(l.basis)}</div>
+    <p><span class="tag ok">✔ Active</span><span class="tag">Sample listing</span></p>
+    <p>Quantity: <b>${esc(l.qty)} ${esc(l.unit)}</b><br>Location: ${esc(l.location)}<br>Available from: ${fdate(l.date)}<br>Quality: ${esc(l.grade||'Not stated')}<br>Listed on: ${fdate(l.created)}</p>
+    <p>${esc(l.desc||'No description.')}</p>
+    <p>Seller: <b>${esc(s.name)}</b> (not verified)<br>${esc(s.contact)}</p>
+  </div>
+  <div class="card" style="margin-top:1rem">
+    <h2>Send an inquiry</h2>
+    <p>An inquiry is not an order. The farmer will contact you.</p>
+    <form id="inq" onsubmit="sendInq(event,${l.id})" novalidate>
+      <label for="ib">Your name or business</label><input id="ib"><div class="err" id="e-ib"></div>
+      <div class="row2"><div><label for="iq">Quantity you need (${esc(l.unit)})</label><input id="iq" type="number" min="0" step="any"><div class="err" id="e-iq"></div></div>
+      <div><label for="ip">How should the farmer reach you?</label><select id="ip"><option value="Phone call">Phone call</option><option value="Text message">Text message</option></select></div></div>
+      <label for="im">Message (optional)</label><textarea id="im" rows="3"></textarea>
+      <div class="actions"><button type="submit">Send inquiry</button></div>
+    </form>
+  </div>
+  <div class="card" style="margin-top:1rem">
+    <h2>Or place an order (simulated)</h2>
+    <p>Choose delivery and payment. This is a demo, so no real money moves.</p>
+    <form id="ord" onsubmit="placeOrder(event,${l.id})" novalidate>
+      <label for="o-name">Your name or business</label><input id="o-name"><div class="err" id="e-o-name"></div>
+      <label for="o-qty">Quantity (${esc(l.unit)}), up to ${esc(l.qty)}</label><input id="o-qty" type="number" min="0" step="any" oninput="calcTotal(${l.id})"><div class="err" id="e-o-qty"></div>
+      <label>Delivery option</label>
+      <div class="radio"><label><input type="radio" name="dl" value="pickup" checked onchange="calcTotal(${l.id})"> 🚜 Farm pickup (free)</label>
+      <label><input type="radio" name="dl" value="delivery" onchange="calcTotal(${l.id})"> 🚚 Home delivery (₹${FEE})</label></div>
+      <div id="addrBox" style="display:none"><label for="o-addr">Delivery town or area (no exact address needed)</label><input id="o-addr"><div class="err" id="e-o-addr"></div></div>
+      <label for="o-pay">Payment method</label>
+      <select id="o-pay"><option value="Cash on handover">Cash on handover</option><option value="UPI (simulated)">UPI (simulated)</option><option value="Bank transfer (simulated)">Bank transfer (simulated)</option></select>
+      <div class="sum" id="sum" aria-live="polite">Enter a quantity to see the total.</div>
+      <div class="actions"><button type="submit">Place order (simulated)</button></div>
+    </form>
+  </div>`;
+}
+function setErr(f, msg){ const i=$(f), e=$('e-'+f); if(!i||!e) return; e.textContent=msg?tr(msg):''; if(msg) i.setAttribute('aria-invalid','true'); else i.removeAttribute('aria-invalid'); if(msg) i.setAttribute('aria-describedby','e-'+f); }
+function sendInq(ev, lid){
+  ev.preventDefault();
+  const name=$('ib').value.trim(), qty=parseFloat($('iq').value);
+  let bad=false;
+  setErr('ib', name?'':'Enter your name or business.'); if(!name) bad=true;
+  setErr('iq', qty>0?'':'Enter a quantity greater than 0.'); if(!(qty>0)) bad=true;
+  if(bad){ toast('Please fix the highlighted fields.'); return; }
+  db.inquiries.push({id:db.nextI++, listing:lid, buyer:name, qty, pref:$('ip').value, msg:$('im').value.trim(), status:'new', created:new Date().toISOString()});
+  save(); ui.openId=null; render(); toast('Inquiry sent. The farmer can now see it in their inbox.');
+}
+
+
+/* ---------- Orders (simulated payment and delivery) ---------- */
+const FEE=150, KG={kg:1,quintal:100,tonne:1000};
+function goodsTotal(l,qty){ const b=l.basis.replace('per ',''); if(b===l.unit) return l.price*qty; if(KG[b]&&KG[l.unit]) return l.price*qty*KG[l.unit]/KG[b]; return null; }
+function calcTotal(id){
+  const l=listing(id), q=parseFloat($('o-qty').value), del=document.querySelector('input[name=dl]:checked').value==='delivery';
+  $('addrBox').style.display=del?'block':'none';
+  const g=q>0?goodsTotal(l,q):null;
+  $('sum').innerHTML = !(q>0) ? 'Enter a quantity to see the total.'
+    : g===null ? `<div><span>Goods</span><span>Farmer confirms price</span></div>`
+    : `<div><span>Goods (${q} ${esc(l.unit)})</span><span>${money(g)}</span></div><div><span>Delivery</span><span>${del?money(FEE):'Free'}</span></div><div class="tot"><span>Total</span><span>${money(g+(del?FEE:0))}</span></div>`;
+  applyLang($('sum'));
+}
+function placeOrder(ev,lid){
+  ev.preventDefault();
+  const l=listing(lid), name=$('o-name').value.trim(), qty=parseFloat($('o-qty').value);
+  const del=document.querySelector('input[name=dl]:checked').value==='delivery', addr=$('o-addr').value.trim();
+  let bad=false;
+  setErr('o-name',name?'':'Enter your name or business.'); if(!name) bad=true;
+  const okq=qty>0&&qty<=l.qty; setErr('o-qty',okq?'':'Enter a quantity between 0 and '+l.qty+'.'); if(!okq) bad=true;
+  setErr('o-addr',(!del||addr)?'':'Enter your town or area.'); if(del&&!addr) bad=true;
+  if(bad){ toast('Please fix the highlighted fields.'); return; }
+  const g=goodsTotal(l,qty);
+  db.orders.push({id:db.nextO++,listing:lid,buyer:name,qty,delivery:del,addr,pay:$('o-pay').value,goods:g,fee:del?FEE:0,payStatus:'pending',status:0,created:new Date().toISOString()});
+  save(); ui.openId=null; ui.view='orders'; render(); window.scrollTo(0,0); toast('Order placed. The farmer will confirm it.');
+}
+function steps(o){ return ['Placed','Confirmed',o.delivery?'Out for delivery':'Ready for pickup','Completed']; }
+function trackHtml(o){ return `<div class="track" role="list">${steps(o).map((t,i)=>`<div role="listitem" class="tstep ${i<o.status?'done':i===o.status?'now':''}">${i<o.status?'✔':i===o.status?'●':'○'} ${t}</div>`).join('')}</div>`; }
+function orderMeta(o,l){ const tot=o.goods===null?null:o.goods+o.fee;
+  return `${esc(o.qty)} ${esc(l.unit)} · ${o.delivery?'🚚 Delivery to '+esc(o.addr):'🚜 Farm pickup'}<br>Payment: ${esc(o.pay)} · ${o.payStatus==='paid'?'<span class="tag ok">✔ Paid (simulated)</span>':'<span class="tag">Payment pending</span>'}<br>Total: <b>${tot===null?'to be confirmed by farmer':money(tot)}</b>`; }
+function ordersView(){
+  const list=db.orders.slice().reverse();
+  return `<h1>My orders</h1>`+(list.length?list.map(o=>{ const l=listing(o.listing);
+    const canPay=o.payStatus==='pending'&&o.pay!=='Cash on handover';
+    return `<article class="card" style="margin-bottom:1rem"><h3>${emoji(l.crop)} ${esc(l.crop)} · Order #${o.id}</h3>${trackHtml(o)}<p>${orderMeta(o,l)}</p>
+    ${canPay?`<button id="pay${o.id}" onclick="payNow(${o.id})">Pay now (simulated)</button>`:''}</article>`; }).join('')
+    : `<div class="empty"><p><b>No orders yet.</b></p><button onclick="go('buyer')">Find produce</button></div>`);
+}
+function payNow(id){ const b=$('pay'+id); b.disabled=true; b.textContent=tr('Processing…'); b.className='pulse'; setTimeout(()=>{ db.orders.find(o=>o.id===id).payStatus='paid'; save(); render(); toast('Payment successful (simulated). No real money moved.'); },1500); }
+function ordersFarmer(ords){
+  if(!ords.length) return `<div class="empty"><p><b>No orders yet.</b></p><p>Orders from buyers appear here.</p></div>`;
+  return ords.slice().reverse().map(o=>{ const l=listing(o.listing), st=steps(o), last=o.status>=3;
+    return `<article class="card" style="margin-bottom:1rem"><h3>${emoji(l.crop)} ${esc(l.crop)} · Order #${o.id} from ${esc(o.buyer)}</h3>${trackHtml(o)}<p>${orderMeta(o,l)}</p>
+    ${last?'<span class="tag ok">✔ Order complete</span>':`<button onclick="advance(${o.id})">Mark as: ${st[o.status+1]}</button>`}</article>`; }).join('');
+}
+function advance(id){
+  const o=db.orders.find(x=>x.id===id), l=listing(o.listing); o.status++;
+  if(o.status===1){ l.qty=Math.max(0,+(l.qty-o.qty).toFixed(2)); if(l.qty===0) l.status='inactive'; }
+  if(o.status===3 && o.pay==='Cash on handover') o.payStatus='paid';
+  save(); render(); toast('Order updated: '+steps(o)[o.status]+'.');
+}
+
+/* ---------- Farmer ---------- */
+function farmerView(){
+  const s = seller(ui.farmer);
+  const mine = db.listings.filter(l=>l.seller===s.id);
+  const inq = db.inquiries.filter(i=>listing(i.listing).seller===s.id);
+  const newCount = inq.filter(i=>i.status==='new').length;
+  const ords = db.orders.filter(o=>listing(o.listing).seller===s.id), openOrd = ords.filter(o=>o.status<3).length;
+  const tabBtn = (t,label)=>`<button class="alt" ${ui.tab===t?'aria-current="true"':''} onclick="ui.tab='${t}';ui.editId=null;render()">${label}</button>`;
+  let body='';
+  if(ui.tab==='listings') body = myListings(mine);
+  else if(ui.tab==='form') body = formView();
+  else if(ui.tab==='orders') body = ordersFarmer(ords);
+  else body = inboxView(inq);
+  return `<h1>Sell crops</h1>
+  <label for="fs">Demo farmer</label>
+  <select id="fs" onchange="ui.farmer=this.value;ui.editId=null;render()">${SELLERS.map(x=>`<option value="${x.id}" ${x.id===ui.farmer?'selected':''}>${esc(x.name)}</option>`).join('')}</select>
+  <div class="tabs">${tabBtn('listings','My listings')}${tabBtn('form', ui.editId?'Edit listing':'Add listing')}${tabBtn('inbox','Inquiries ('+newCount+' new)')}${tabBtn('orders','Orders ('+openOrd+' open)')}</div>
+  ${body}`;
+}
+function myListings(mine){
+  if(!mine.length) return `<div class="empty"><p><b>You have no listings yet.</b></p><button onclick="ui.tab='form';render()">Add your first listing</button></div>`;
+  return `<div class="grid">${mine.map(l=>`<article class="card ${l.status==='active'?'':'dim'}"><span class="emoji" aria-hidden="true">${emoji(l.crop)}</span><h3>${esc(l.crop)}</h3>
+    <div class="price">${money(l.price)} ${esc(l.basis)}</div>
+    <p>${esc(l.qty)} ${esc(l.unit)} · ${esc(l.location)}<br>Available from ${fdate(l.date)}</p>
+    <p>${l.status==='active'?'<span class="tag ok">✔ Active</span>':'<span class="tag off">✖ Inactive / sold</span>'}</p>
+    <div class="actions"><button class="alt" onclick="editL(${l.id})">Edit</button>
+    <button class="${l.status==='active'?'danger':'alt'}" onclick="toggleL(${l.id})">${l.status==='active'?'Mark sold / inactive':'Make active again'}</button></div></article>`).join('')}</div>`;
+}
+function editL(id){ ui.editId=id; ui.tab='form'; render(); }
+function toggleL(id){ const l=listing(id); l.status = l.status==='active'?'inactive':'active'; save(); render(); toast(l.status==='active'?'Listing is active and visible to buyers.':'Listing hidden from buyers.'); }
+function formView(){
+  const l = ui.editId ? listing(ui.editId) : {crop:'',qty:'',unit:'kg',price:'',basis:'per kg',location:seller(ui.farmer).location,date:'',grade:'',desc:''};
+  const opt=(arr,v)=>arr.map(x=>`<option value="${esc(x)}" ${x===v?'selected':''}>${esc(x)}</option>`).join('');
+  return `<div class="card"><h2>${ui.editId?'Edit listing':'Add a listing'}</h2><p>Fields marked * are required.</p>
+  <form onsubmit="saveL(event)" novalidate>
+    <label for="f-crop">Crop name *</label><input id="f-crop" value="${esc(l.crop)}"><div class="err" id="e-f-crop"></div>
+    <div class="row2"><div><label for="f-qty">Quantity *</label><input id="f-qty" type="number" min="0" step="any" value="${esc(l.qty)}"><div class="err" id="e-f-qty"></div></div>
+    <div><label for="f-unit">Unit *</label><select id="f-unit">${opt(UNITS,l.unit)}</select></div></div>
+    <div class="row2"><div><label for="f-price">Price in ₹ *</label><input id="f-price" type="number" min="0" step="any" value="${esc(l.price)}"><div class="err" id="e-f-price"></div></div>
+    <div><label for="f-basis">Price basis *</label><select id="f-basis">${opt(UNITS.map(u=>'per '+u),l.basis)}</select></div></div>
+    <div class="row2"><div><label for="f-loc">Location (village or district) *</label><input id="f-loc" value="${esc(l.location)}"><div class="err" id="e-f-loc"></div></div>
+    <div><label for="f-date">Available from *</label><input id="f-date" type="date" value="${esc(l.date)}"><div class="err" id="e-f-date"></div></div></div>
+    <label for="f-grade">Quality / grade (optional)</label><input id="f-grade" value="${esc(l.grade)}">
+    <label for="f-desc">Description (optional)</label><textarea id="f-desc" rows="3">${esc(l.desc)}</textarea>
+    <div class="actions"><button type="submit">${ui.editId?'Save changes':'Publish listing'}</button><button type="button" class="alt" onclick="ui.editId=null;ui.tab='listings';render()">Cancel</button></div>
+  </form></div>`;
+}
+function saveL(ev){
+  ev.preventDefault();
+  const v = (id)=>$(id).value.trim();
+  const qty=parseFloat(v('f-qty')), price=parseFloat(v('f-price'));
+  const checks = [['f-crop', v('f-crop'), 'Enter the crop name.'], ['f-qty', qty>0, 'Enter a quantity greater than 0.'], ['f-price', price>0, 'Enter a price greater than 0.'], ['f-loc', v('f-loc'), 'Enter a location.'], ['f-date', v('f-date'), 'Choose the date it is available.']];
+  let bad=false;
+  checks.forEach(([id,ok,msg])=>{ setErr(id, ok?'':msg); if(!ok) bad=true; });
+  if(bad){ toast('Please fix the highlighted fields. Your entries are kept.'); return; }
+  const data = {crop:v('f-crop'), qty, unit:$('f-unit').value, price, basis:$('f-basis').value, location:v('f-loc'), date:v('f-date'), grade:v('f-grade'), desc:v('f-desc')};
+  if(ui.editId){ Object.assign(listing(ui.editId), data); toast('Changes saved.'); }
+  else { db.listings.push({id:db.nextL++, seller:ui.farmer, status:'active', created:new Date().toISOString().slice(0,10), ...data}); toast('Listing published. Buyers can now find it.'); }
+  save(); ui.editId=null; ui.tab='listings'; render();
+}
+function inboxView(inq){
+  if(!inq.length) return `<div class="empty"><p><b>No inquiries yet.</b></p><p>When a buyer asks about your crop, it will appear here.</p></div>`;
+  return inq.slice().reverse().map(i=>{ const l=listing(i.listing); return `<article class="card" style="margin-bottom:1rem">
+    <h3>${esc(l.crop)} · ${esc(i.qty)} ${esc(l.unit)} requested</h3>
+    <p>From <b>${esc(i.buyer)}</b> · prefers ${esc(i.pref)}<br>${new Date(i.created).toLocaleString(LOC())}</p>
+    ${i.msg?`<p>“${esc(i.msg)}”</p>`:''}
+    <label for="st${i.id}">Status</label>
+    <select id="st${i.id}" onchange="setSt(${i.id},this.value)">${['new','contacted','closed'].map(x=>`<option value="${x}" ${x===i.status?'selected':''}>${x}</option>`).join('')}</select>
+  </article>`; }).join('');
+}
+function setSt(id, v){ db.inquiries.find(i=>i.id===id).status=v; save(); render(); toast('Inquiry marked as '+v+'.'); }
+
+$('lang').value=LANG; document.documentElement.lang=LANG;
+render();
+</script>
+</body>
+</html>
